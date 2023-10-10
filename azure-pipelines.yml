@@ -4,21 +4,77 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 #added a comment to make revision
 trigger:
+
 - main
 
+ 
+
 pool:
+
   vmImage: ubuntu-latest
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+ 
 
-    
+stages:
+
+ 
+
+- stage: Build
+
+  jobs:
+
+  - deployment: deploy
+
+    displayName: Deployment
+
+    environment: Stage4
+
+    strategy:
+
+      runOnce:
+
+        deploy:
+
+          steps:
+
+            - script: echo Deployment
+
+              displayName: "Para Job 1"
+
+ 
+
+- stage: parallel2
+
+  dependsOn: Build
+
+  jobs:
+
+  - deployment: deploy
+
+    displayName: Parallel deploy 2
+
+    environment: Stage3
+
+    strategy:
+
+      runOnce:
+
+        deploy:
+
+          steps:
+
+            - script: echo parallel job 2
+
+              displayName: "Para Job 2"
+
+ 
+
+- stage: Deploy
+
+  jobs:
+
+  - job: Exit
+
+    steps:
+
+    - script: echo "exiting"
